@@ -1,0 +1,65 @@
+NUM ^coeffs(10)
+RFD 0 0 1 11
+^coeffs(1) == 4
+^coeffs(2) == 5
+^coeffs(3) == 7
+^coeffs(4) == 9
+^coeffs(5) == 10
+^coeffs(6) == 12
+^coeffs(7) == 14
+^coeffs(8) == 16
+! TEST
+! -------------------------------------------
+! Inputs 
+^scale == #1;
+^fov == #2;
+^saveresults == #3
+^nfields == #4
+! -------------------------------------------
+
+^fieldtype == (TYP FLD)                    
+ 
+OUT NO
+FOR ^j 1 9
+    IF ^j = 1
+        FMA
+        FFD RWE
+        SSI  ^scale
+        LIS NO
+        WBF B5
+        FCO CIR ANG
+        NFX  ^nfields
+        NFY  ^nfields
+        IF ^fov > 0 
+            XMI  -^fov
+            XMA  ^fov
+            YMI  -^fov
+            YMA  ^fov
+        END IF
+        GO  
+    ELS
+        FMA
+        FFD WPO
+        WCN ^coeffs(^j-1)
+        WPT ZFR 37
+        SSI  ^scale
+        LIS NO
+        WBF B5
+        FCO CIR ANG
+        NFX  ^nfields
+        NFY  ^nfields
+        IF ^fov > 0 
+            XMI  -^fov
+            XMA  ^fov
+            YMI  -^fov
+            YMA  ^fov
+        END IF
+        GO 
+    END IF
+    ^number == NUM_TO_STR(^j)
+    BUF PUT B5 I3 $fieldtype
+    IF ^saveresults = 1
+    BUF EXP B5 cv_ffd_$number
+    END IF
+END FOR
+OUT YES
